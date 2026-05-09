@@ -17,38 +17,31 @@ public class MainMenu : MonoBehaviour
 
     public void PlayGame()
     {
-        PlaySound();
+        AudioManager.Instance?.PlayButtonClick();
         SceneManager.LoadScene("Main Game");
+        if (FindFirstObjectByType<TileManager>() != null)
+            FindFirstObjectByType<TileManager>().ResetTiles();
+    }
 
-        // Reset tiles when the game starts
-        if (FindObjectOfType<TileManager>() != null)
-        {
-            FindObjectOfType<TileManager>().ResetTiles();
-        }
+    public void QuitGame()
+    {
+        AudioManager.Instance?.PlayButtonClick();
+        StartCoroutine(QuitAfterDelay());
+    }
 
-        // Reset player position when starting the game
-        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
-        if (playerObject != null)
-        {
-            playerTransform = playerObject.transform;
-            playerTransform.position = new Vector3(0, 1, 0);
-        }
+    private IEnumerator QuitAfterDelay()
+    {
+        yield return new WaitForSeconds(0.1f);
+        Application.Quit();
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
     }
 
     public void OpenSettings()
     {
         PlaySound();
         Debug.Log("Settings Opened!"); // Settings logic
-    }
-
-    public void QuitGame()
-    {
-        if (buttonClickSound != null && !buttonClickSound.mute)
-        {
-            buttonClickSound.Play();
-        }
-
-        StartCoroutine(QuitAfterSound()); // Quit after sound finishes
     }
 
     private IEnumerator QuitAfterSound()

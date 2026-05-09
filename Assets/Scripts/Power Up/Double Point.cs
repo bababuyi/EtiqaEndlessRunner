@@ -21,17 +21,6 @@ public class DoublePoint : MonoBehaviour
 
                 GameManager.Instance?.ActivateDoublePoints(duration);
                 AudioManager.Instance?.PlayDoubleCoin();
-/*
-            else
-            {
-                Debug.LogWarning("DoublePointsManager is missing from the scene!");
-            }
-*/
-            // Play double points power-up sound
-            if (AudioManager.Instance != null)
-            {
-                AudioManager.Instance?.PlayDoubleCoin();
-            }
 
             Destroy(gameObject);
         }

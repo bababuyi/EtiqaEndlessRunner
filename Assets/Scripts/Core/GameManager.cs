@@ -7,7 +7,7 @@ public class GameManager : MonoBehaviour
 {
     [Header("Manager References")]
     public UIManager uiManager;
-    public AudioManagerS audioManager;
+    public AudioManager audioManager;
 
     public static GameManager Instance { get; private set; }
 

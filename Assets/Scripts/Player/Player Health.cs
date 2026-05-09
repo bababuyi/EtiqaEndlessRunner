@@ -12,29 +12,13 @@ public class PlayerHealth : MonoBehaviour
     private Movement movementScript; // Reference to Movement script
 
     private bool isHurt = false;
-    private bool isVulnerable = true;
     private bool isInvincible = false;
-    private bool isInvulnerable = false;
 
     void Start()
     {
-
-        GameManager = FindObjectOfType<GameManager>();
-
-        if (GameManager != null)
-        {
-            Debug.Log("GameOverManager is assigned.");
-        }
-        else
-        {
-            Debug.LogError("GameOverManager is not assigned!");
-        }
-
         movementScript = GetComponent<Movement>();
         if (movementScript == null)
-        {
             Debug.LogError("Movement script not found on player!");
-        }
     }
 
     void Update()
@@ -66,13 +50,9 @@ public class PlayerHealth : MonoBehaviour
         if (isHurt) // Player is already hurt, so they die
         {
             Debug.Log("Player hit again within hit window! GAME OVER.");
-
-            // Play Game Over sound
-            if (GameSoundManager.instance != null)
-            {
-                AudioManager.Instance?.PlayHit();
-                AudioManager.Instance?.PlayLose();
-            }
+ 
+            AudioManager.Instance?.PlayHit();
+            AudioManager.Instance?.PlayLose();
 
             GameOver();
             yield break;
@@ -80,7 +60,6 @@ public class PlayerHealth : MonoBehaviour
 
         Debug.Log("Player stumbled! Speed reduced.");
         isHurt = true;
-        isVulnerable = false;
 
         // Reduce speed
         movementScript.forwardSpeed -= speedReduction;
@@ -111,7 +90,6 @@ public class PlayerHealth : MonoBehaviour
         }
 
         yield return new WaitForSeconds(recoveryTime - hitWindow);
-        isVulnerable = true;
         Debug.Log("Player is now vulnerable again.");
     }
 
@@ -191,23 +169,6 @@ public class PlayerHealth : MonoBehaviour
     void GameOver()
     {
         Debug.Log("GAME OVER! Player lost the run.");
-        if (gameOverManager != null)
-        {
-            GameManager.Instance?.TriggerGameOver();
-        }
-        else
-        {
-            Debug.LogError("GameOverManager is not assigned in PlayerHealth! It may have been destroyed.");
-        }
+        GameManager.Instance?.TriggerGameOver();
     }
-
-
-    void OnDestroy()
-    {
-        if (gameOverManager != null)
-        {
-            Debug.Log("GameOverManager is being destroyed.");
-        }
-    }
-
 }
