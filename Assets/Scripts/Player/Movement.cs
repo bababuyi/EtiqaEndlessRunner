@@ -4,11 +4,6 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
-    // Movement parameters
-    public float forwardSpeed = 5f;
-    public float maxSpeed = 15f;
-    public float speedIncreaseDuration = 30f;
-
     public float laneDistance = 3f;
     public float laneSwitchSpeed = 10f;
 
@@ -48,7 +43,6 @@ public class Movement : MonoBehaviour
         defaultGravity = rb.useGravity ? 1f : 0f;
 
         rb.isKinematic = false;
-        StartCoroutine(IncreaseSpeedOverTime());
     }
 
     void Update()
@@ -58,16 +52,11 @@ public class Movement : MonoBehaviour
             rb.isKinematic = false;
         }
 
-        MoveForward();
         HandleInput();
         MoveToTargetLane();
     }
 
-    // Moves the player forward automatically
-    void MoveForward()
-    {
-        transform.Translate(Vector3.forward * forwardSpeed * Time.deltaTime);
-    }
+    
 
     // Handles input
     void HandleInput()
@@ -121,11 +110,10 @@ public class Movement : MonoBehaviour
         targetLane = Mathf.Clamp(targetLane, 0, 2);
     }
 
-    // Moves the player towards the target lane
     public void MoveToTargetLane()
     {
         float targetX = (targetLane - 1) * laneDistance;
-        targetPosition = new Vector3(targetX, transform.position.y, transform.position.z);
+        targetPosition = new Vector3(targetX, transform.position.y, 0f);
         transform.position = Vector3.Lerp(transform.position, targetPosition, laneSwitchSpeed * Time.deltaTime);
     }
 
@@ -154,38 +142,21 @@ public class Movement : MonoBehaviour
         {
             isRolling = true;
 
-            // Store original values
             float originalHeight = playerCollider.height;
             Vector3 originalCenter = playerCollider.center;
 
-            // Adjust collider for rolling
             playerCollider.height *= 0.5f;
             playerCollider.center = new Vector3(playerCollider.center.x, 1f, playerCollider.center.z);
-            forwardSpeed *= rollSpeedMultiplier;
+            TileManager.Instance.WorldSpeed *= rollSpeedMultiplier;
 
             yield return new WaitForSeconds(rollDuration);
 
-            // Reset collider values
             playerCollider.height = originalHeight;
             playerCollider.center = originalCenter;
-            forwardSpeed /= rollSpeedMultiplier;
+            TileManager.Instance.WorldSpeed /= rollSpeedMultiplier;
 
             isRolling = false;
         }
-    }
-
-    // Gradually increases the forward speed over time
-    IEnumerator IncreaseSpeedOverTime()
-    {
-        float startTime = Time.time;
-        float startSpeed = forwardSpeed;
-
-        while (Time.time - startTime < speedIncreaseDuration)
-        {
-            forwardSpeed = Mathf.Lerp(startSpeed, maxSpeed, (Time.time - startTime) / speedIncreaseDuration);
-            yield return null;
-        }
-        forwardSpeed = maxSpeed;
     }
 
     // Activates Flying Power-Up (if needed)
@@ -217,10 +188,7 @@ public class Movement : MonoBehaviour
     // Resets the player's position and state (if needed)
     public void ResetPlayer()
     {
-        transform.position = new Vector3(0, 0, 0);
-        forwardSpeed = 5f;
-        maxSpeed = 15f;
-        speedIncreaseDuration = 30f;
+        transform.position = new Vector3(0, 1, 0);
         isJumping = false;
         isRolling = false;
         isFlying = false;
@@ -232,8 +200,6 @@ public class Movement : MonoBehaviour
         playerCollider.center = originalColliderCenter;
 
         if (rb.isKinematic)
-        {
             rb.isKinematic = false;
-        }
     }
 }

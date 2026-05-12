@@ -12,8 +12,7 @@ public class PlayerInitializer : MonoBehaviour
         {
             // Instantiate the player if it doesn't exist
             GameObject player = Instantiate(playerPrefab, new Vector3(0, 1, 0), Quaternion.identity);
-            player.tag = "Player"; // Ensure the player has the correct tag
-            DontDestroyOnLoad(player); // Make the player persist across scenes
+            player.tag = "Player";
         }
     }
 }

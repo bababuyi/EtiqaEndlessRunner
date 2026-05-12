@@ -1,185 +1,188 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+
 public class TileManager : MonoBehaviour
 {
-    public GameObject firstTilePrefab; // The specific tile that always spawns first
-    public GameObject[] tilePrefabs;
-    public GameObject[] countryTiles;
-    public float zSpawn = 0;
-    public float zSpawnSide = 0;
-    public float tileLength = 30;
-    public int tileAmount = 5;
-    public float tileGap = 35;
-    public int countryAmount = 5;
-    public int Count = 0;
-    public int currentCountry = 0;
+    public static TileManager Instance { get; private set; }
 
-    private List<GameObject> activeTiles = new List<GameObject>();
+    [Header("Tile Prefabs")]
+    [SerializeField] private GameObject firstTilePrefab;
+    [SerializeField] private GameObject[] roadTilePrefabs;
+    [SerializeField] private GameObject[] sideTilePrefabs;
+
+    [Header("Settings")]
+    [SerializeField] private int tilesAhead = 6;
+    [SerializeField] private float tileLength = 30f;
+    [SerializeField] private float startSpeed = 8f;
+    [SerializeField] private float maxSpeed = 22f;
+    [SerializeField] private float timeToMaxSpeed = 120f;
+
+    [Header("World Root")]
+    [SerializeField] private Transform worldRoot;
+
+    public float WorldSpeed { get; set; }
+
+    private float elapsedTime;
+    private float nextSpawnZ;
+    private int sideIndex;
+    private int sideCount;
+
+    private List<GameObject> activeRoadTiles = new List<GameObject>();
     private List<GameObject> activeSideTiles = new List<GameObject>();
 
-    public Transform playerTransform;
-    public float fixedYPosition = 0f;
-    private bool hasPlayerMoved = false;
+    private const int SIDE_CYCLE = 5;
 
-    private static TileManager instance;
-
-    void Awake()
+    private void Awake()
     {
-        if (instance == null)
+        if (Instance == null)
         {
-            instance = this;
+            Instance = this;
             DontDestroyOnLoad(gameObject);
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
         else
         {
             Destroy(gameObject);
-            return;
         }
     }
 
-    void Start()
-    {
-        if (playerTransform == null)
-        {
-            playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
+    private void Start() => InitialiseWorld();
 
-            if (playerTransform == null)
+    private void Update()
+    {
+        Debug.Log($"GM exists: {GameManager.Instance != null} | State: {GameManager.Instance?.CurrentState} | worldRoot: {worldRoot != null} | timeScale: {Time.timeScale}");
+
+        if (GameManager.Instance == null) return;
+        if (GameManager.Instance.CurrentState != GameManager.GameState.Playing) return;
+
+        MoveWorld();
+        TrySpawn();
+        TryRecycle();
+        UpdateSpeed();
+    }
+
+    private void InitialiseWorld()
+    {
+        elapsedTime = 0f;
+        WorldSpeed = startSpeed;
+        nextSpawnZ = 0f;
+        sideIndex = 0;
+        sideCount = 0;
+
+        ClearAll();
+
+        SpawnTile(firstTilePrefab ?? roadTilePrefabs[0], nextSpawnZ);
+        SpawnSide(nextSpawnZ);
+        nextSpawnZ += tileLength;
+
+        while (activeRoadTiles.Count < tilesAhead)
+            SpawnNext();
+    }
+
+    private void MoveWorld()
+    {
+        worldRoot.position -= new Vector3(0, 0, WorldSpeed * Time.deltaTime);
+    }
+
+    private void TrySpawn()
+    {
+
+        float frontEdge = nextSpawnZ + worldRoot.position.z;
+        while (frontEdge < tilesAhead * tileLength)
+        {
+            SpawnNext();
+            frontEdge = nextSpawnZ + worldRoot.position.z;
+        }
+    }
+
+    private void TryRecycle()
+    {
+        if (activeRoadTiles.Count == 0) return;
+
+        GameObject oldest = activeRoadTiles[0];
+        float backEdge = oldest.transform.position.z;
+
+        if (backEdge < -tileLength * 2f)
+        {
+            activeRoadTiles.RemoveAt(0);
+            Destroy(oldest);
+
+            if (activeSideTiles.Count > 0)
             {
-                Debug.LogError("Player transform not found!");
-                return;
+                Destroy(activeSideTiles[0]);
+                activeSideTiles.RemoveAt(0);
             }
         }
+    }
 
-        if (tilePrefabs.Length == 0 || countryTiles.Length == 0)
-        {
-            Debug.LogError("Tile prefabs or country tiles not assigned!");
-            return;
-        }
+    private void SpawnNext()
+    {
+        int index = Random.Range(0, roadTilePrefabs.Length);
+        SpawnTile(roadTilePrefabs[index], nextSpawnZ);
+        SpawnSide(nextSpawnZ);
+        nextSpawnZ += tileLength;
 
-        if (activeTiles.Count == 0)
+        if (sideTilePrefabs.Length == 0) return;
+
+        sideCount++;
+        if (sideCount >= SIDE_CYCLE)
         {
-            SpawnInitialTiles();
+            sideCount = 0;
+            sideIndex = (sideIndex + 1) % sideTilePrefabs.Length;
         }
     }
 
-    void Update()
+    private void SpawnTile(GameObject prefab, float z)
     {
-        if (playerTransform != null && !hasPlayerMoved && playerTransform.position.z > 0f)
-        {
-            hasPlayerMoved = true;
-        }
-
-        if (hasPlayerMoved)
-        {
-            if (playerTransform.position.z - tileGap > zSpawn - (tileAmount * tileLength))
-            {
-                SpawnRoadTile(Random.Range(0, tilePrefabs.Length));
-                SpawnSideTile(currentCountry);
-                Count++;
-                DeleteTile();
-            }
-        }
-
-        if (Count > countryAmount)
-        {
-            Count = 0;
-            currentCountry++;
-        }
-
-        if (currentCountry >= countryTiles.Length)
-            currentCountry = 0;
+        Vector3 pos = new Vector3(0, 0, z);
+        GameObject tile = Instantiate(prefab, pos, Quaternion.identity, worldRoot);
+        activeRoadTiles.Add(tile);
     }
 
-    private void SpawnInitialTiles()
+    private void SpawnSide(float z)
     {
-        for (int i = 0; i < tileAmount; i++)
-        {
-            if (i == 0 && firstTilePrefab != null)
-                SpawnSpecificTile(firstTilePrefab); // Spawn the specific first tile
-            else
-                SpawnRoadTile(Random.Range(0, tilePrefabs.Length));
+        if (sideTilePrefabs.Length == 0) return;
 
-            SpawnSideTile(0);
-        }
+        Vector3 pos = new Vector3(0, 0, z);
+        GameObject side = Instantiate(sideTilePrefabs[sideIndex], pos, Quaternion.identity, worldRoot);
+        activeSideTiles.Add(side);
     }
 
-    public void ResetTiles()
+    private void UpdateSpeed()
     {
-        hasPlayerMoved = false;
+        elapsedTime += Time.deltaTime;
+        WorldSpeed = Mathf.Lerp(startSpeed, maxSpeed, elapsedTime / timeToMaxSpeed);
+    }
 
-        foreach (var tile in activeTiles)
-        {
-            Destroy(tile);
-        }
-
-        foreach (var sideTile in activeSideTiles)
-        {
-            Destroy(sideTile);
-        }
-
-        activeTiles.Clear();
+    private void ClearAll()
+    {
+        foreach (var t in activeRoadTiles) if (t) Destroy(t);
+        foreach (var t in activeSideTiles) if (t) Destroy(t);
+        activeRoadTiles.Clear();
         activeSideTiles.Clear();
+        nextSpawnZ = 0f;
 
-        zSpawn = 0;
-        zSpawnSide = 0;
-
-        SpawnInitialTiles();
-        currentCountry++;
+        if (worldRoot) worldRoot.position = Vector3.zero;
     }
 
-    public void SpawnRoadTile(int tileIndex)
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        Vector3 spawnPosition = new Vector3(transform.position.x, fixedYPosition, zSpawn);
-        GameObject tile = Instantiate(tilePrefabs[tileIndex], spawnPosition, transform.rotation);
-        activeTiles.Add(tile);
-        zSpawn += tileLength;
-    }
-
-    private void SpawnSpecificTile(GameObject tilePrefab)
-    {
-        Vector3 spawnPosition = new Vector3(transform.position.x, fixedYPosition, zSpawn);
-        GameObject tile = Instantiate(tilePrefab, spawnPosition, transform.rotation);
-        activeTiles.Add(tile);
-        zSpawn += tileLength;
-    }
-
-    public void SpawnSideTile(int tileIndex)
-    {
-        if (tileIndex < 0 || tileIndex >= countryTiles.Length)
+        if (scene.name == "Main Game")
         {
-            Debug.LogError($"SpawnSideTile: Invalid tileIndex {tileIndex}. Resetting to 0.");
-            tileIndex = 0;
-        }
+            GameObject rootObj = GameObject.FindWithTag("WorldRoot");
+            if (rootObj != null)
+                worldRoot = rootObj.transform;
+            else
+                Debug.LogError("TileManager: WorldRoot not found in scene!");
 
-        Vector3 spawnPosition = new Vector3(transform.position.x, fixedYPosition, zSpawnSide);
-        GameObject sideTile = Instantiate(countryTiles[tileIndex], spawnPosition, transform.rotation);
-        activeSideTiles.Add(sideTile);
-        zSpawnSide += tileLength;
-    }
-
-    private void DeleteTile()
-    {
-        if (activeTiles.Count > 0)
-        {
-            Destroy(activeTiles[0]);
-            activeTiles.RemoveAt(0);
-        }
-
-        if (activeSideTiles.Count > 0)
-        {
-            Destroy(activeSideTiles[0]);
-            activeSideTiles.RemoveAt(0);
+            elapsedTime = 0f;
+            InitialiseWorld();
         }
     }
 
-    public static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    private void OnDestroy()
     {
-        if (instance != null && scene.name == "Main Game")
-        {
-            instance.ResetTiles();
-        }
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 }

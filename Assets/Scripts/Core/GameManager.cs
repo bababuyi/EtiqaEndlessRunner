@@ -105,12 +105,10 @@ public class GameManager : MonoBehaviour
 
     private void TrackScore()
     {
-        if (playerTransform == null) return;
+        if (TileManager.Instance == null) return;
 
-        float moved = Vector3.Distance(playerTransform.position, lastPlayerPosition);
-        lastPlayerPosition = playerTransform.position;
-
-        int updated = CurrentScore + Mathf.RoundToInt(moved * scoreMultiplier);
+        float scoreGain = TileManager.Instance.WorldSpeed * scoreMultiplier * Time.deltaTime;
+        int updated = CurrentScore + Mathf.RoundToInt(scoreGain);
 
         if (updated != CurrentScore)
         {

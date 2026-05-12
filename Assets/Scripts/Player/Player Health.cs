@@ -62,8 +62,7 @@ public class PlayerHealth : MonoBehaviour
         isHurt = true;
 
         // Reduce speed
-        movementScript.forwardSpeed -= speedReduction;
-        movementScript.forwardSpeed = Mathf.Max(3f, movementScript.forwardSpeed); // Prevent speed from going too low
+        TileManager.Instance.WorldSpeed = Mathf.Max(5f,TileManager.Instance.WorldSpeed - speedReduction);
 
         if (AudioManager.Instance != null)
         {
@@ -76,8 +75,6 @@ public class PlayerHealth : MonoBehaviour
         if (!moved)
         {
             Debug.Log("No free lane found. Player stumbles instead.");
-            movementScript.forwardSpeed -= speedReduction;
-            movementScript.forwardSpeed = Mathf.Max(3f, movementScript.forwardSpeed);
         }
 
         yield return new WaitForSeconds(hitWindow);
@@ -86,7 +83,6 @@ public class PlayerHealth : MonoBehaviour
         {
             Debug.Log("Player recovered!");
             isHurt = false;
-            movementScript.forwardSpeed += speedReduction;
         }
 
         yield return new WaitForSeconds(recoveryTime - hitWindow);

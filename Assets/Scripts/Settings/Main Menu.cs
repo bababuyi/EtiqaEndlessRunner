@@ -19,8 +19,8 @@ public class MainMenu : MonoBehaviour
     {
         AudioManager.Instance?.PlayButtonClick();
         SceneManager.LoadScene("Main Game");
-        if (FindFirstObjectByType<TileManager>() != null)
-            FindFirstObjectByType<TileManager>().ResetTiles();
+        //if (FindFirstObjectByType<TileManager>() != null)
+            //FindFirstObjectByType<TileManager>().ResetTiles();
     }
 
     public void QuitGame()
