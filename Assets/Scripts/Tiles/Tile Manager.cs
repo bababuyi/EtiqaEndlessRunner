@@ -13,7 +13,7 @@ public class TileManager : MonoBehaviour
 
     [Header("Settings")]
     [SerializeField] private int tilesAhead = 6;
-    [SerializeField] private float tileLength = 30f;
+    [SerializeField] private float tileLength = 45f;
     [SerializeField] private float startSpeed = 8f;
     [SerializeField] private float maxSpeed = 22f;
     [SerializeField] private float timeToMaxSpeed = 120f;
@@ -28,6 +28,10 @@ public class TileManager : MonoBehaviour
 
     private readonly List<GameObject> activeRoadTiles = new();
     private readonly List<GameObject> activeSideTiles = new();
+
+    private const float LEFT_LANE = -3f;
+    private const float MIDDLE_LANE = 0f;
+    private const float RIGHT_LANE = 3f;
 
     private void Awake()
     {
@@ -54,6 +58,7 @@ public class TileManager : MonoBehaviour
         TrySpawn();
         TryRecycle();
         UpdateSpeed();
+        Debug.Log($"Tiles: {activeRoadTiles.Count}, nextSpawnZ: {nextSpawnZ}, worldZ: {worldRoot.position.z}");
     }
 
     private void OnDestroy()
@@ -69,15 +74,21 @@ public class TileManager : MonoBehaviour
 
         ClearAll();
 
-        SpawnRoadTile(firstTilePrefab ?? roadTilePrefabs[0]);
+        GameObject firstTile = SpawnRoadTile(firstTilePrefab ?? roadTilePrefabs[0]);
         SpawnSideTile();
 
-        while (activeRoadTiles.Count < tilesAhead)
+        float measured = MeasureTileLength(firstTile);
+        if (measured > 0.1f)
         {
-            SpawnNextPair();
+            tileLength = measured;
+
+            nextSpawnZ = tileLength;
         }
+
+        while (activeRoadTiles.Count < tilesAhead)
+            SpawnNextPair();
     }
-    
+
     private void MoveWorld()
     {
         worldRoot.position -= new Vector3(0f, 0f, WorldSpeed * Time.deltaTime);
@@ -85,7 +96,9 @@ public class TileManager : MonoBehaviour
 
     private void TrySpawn()
     {
-        while (nextSpawnZ + worldRoot.position.z < tilesAhead * tileLength)
+        float cameraLocalZ = -worldRoot.position.z;
+
+        while (nextSpawnZ < cameraLocalZ + (tilesAhead * tileLength))
         {
             SpawnNextPair();
         }
@@ -95,9 +108,13 @@ public class TileManager : MonoBehaviour
     {
         if (activeRoadTiles.Count == 0) return;
 
-        if (activeRoadTiles[0].transform.position.z < -tileLength)
+        GameObject oldestTile = activeRoadTiles[0];
+        float tileLocalZ = oldestTile.transform.localPosition.z;
+        float scrollOffset = -worldRoot.position.z;
+
+        if (tileLocalZ < scrollOffset - tileLength)
         {
-            Destroy(activeRoadTiles[0]);
+            Destroy(oldestTile);
             activeRoadTiles.RemoveAt(0);
 
             if (activeSideTiles.Count > 0)
@@ -114,22 +131,55 @@ public class TileManager : MonoBehaviour
         WorldSpeed = Mathf.Lerp(startSpeed, maxSpeed, elapsedTime / timeToMaxSpeed);
     }
 
+    private GameObject PickRandomTile()
+    {
+        int random = Random.Range(0, 100);
+
+        if (random < 40)
+            return roadTilePrefabs[0];
+
+        if (random < 70)
+            return roadTilePrefabs[1];
+
+        if (random < 90)
+            return roadTilePrefabs[2];
+
+        return roadTilePrefabs[3];
+    }
+
     private void SpawnNextPair()
     {
-        int index = Random.Range(0, roadTilePrefabs.Length);
-        SpawnRoadTile(roadTilePrefabs[index]);
+        SpawnRoadTile(PickRandomTile());
         SpawnSideTile();
     }
 
-    private void SpawnRoadTile(GameObject prefab)
+    private GameObject SpawnRoadTile(GameObject prefab)
     {
         GameObject tile = Instantiate(prefab, worldRoot);
-
         tile.transform.localPosition = new Vector3(0f, 0f, nextSpawnZ);
         tile.transform.localRotation = Quaternion.identity;
-        
         activeRoadTiles.Add(tile);
         nextSpawnZ += tileLength;
+        return tile;
+    }
+
+    private float MeasureTileLength(GameObject tile)
+    {
+        Renderer[] renderers = tile.GetComponentsInChildren<Renderer>();
+
+        if (renderers.Length == 0)
+        {
+            Debug.LogWarning("Keeping current tileLength.");
+            return tileLength;
+        }
+
+        Bounds combined = renderers[0].bounds;
+        foreach (Renderer r in renderers)
+            combined.Encapsulate(r.bounds);
+
+        float measured = combined.size.z;
+        Debug.Log($"TileManager: Auto-measured tile length = {measured:F2}");
+        return measured;
     }
 
     private void SpawnSideTile()
