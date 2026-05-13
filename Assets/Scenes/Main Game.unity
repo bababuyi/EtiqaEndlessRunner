@@ -4929,7 +4929,7 @@ MonoBehaviour:
   - {fileID: 4021837320513784677, guid: 16cab7e96ac3c2941ad754ac3774e8d8, type: 3}
   sideTilePrefabs: []
   tilesAhead: 6
-  tileLength: 30
+  tileLength: 28
   startSpeed: 8
   maxSpeed: 22
   timeToMaxSpeed: 120
