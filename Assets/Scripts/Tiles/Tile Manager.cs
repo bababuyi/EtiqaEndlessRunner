@@ -18,20 +18,16 @@ public class TileManager : MonoBehaviour
     [SerializeField] private float maxSpeed = 22f;
     [SerializeField] private float timeToMaxSpeed = 120f;
 
-    [Header("World Root")]
+    [Header("References")]
     [SerializeField] private Transform worldRoot;
 
     public float WorldSpeed { get; set; }
 
-    private float elapsedTime;
     private float nextSpawnZ;
-    private int sideIndex;
-    private int sideCount;
+    private float elapsedTime;
 
-    private List<GameObject> activeRoadTiles = new List<GameObject>();
-    private List<GameObject> activeSideTiles = new List<GameObject>();
-
-    private const int SIDE_CYCLE = 5;
+    private readonly List<GameObject> activeRoadTiles = new();
+    private readonly List<GameObject> activeSideTiles = new();
 
     private void Awake()
     {
@@ -51,8 +47,6 @@ public class TileManager : MonoBehaviour
 
     private void Update()
     {
-        Debug.Log($"GM exists: {GameManager.Instance != null} | State: {GameManager.Instance?.CurrentState} | worldRoot: {worldRoot != null} | timeScale: {Time.timeScale}");
-
         if (GameManager.Instance == null) return;
         if (GameManager.Instance.CurrentState != GameManager.GameState.Playing) return;
 
@@ -62,37 +56,38 @@ public class TileManager : MonoBehaviour
         UpdateSpeed();
     }
 
+    private void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
     private void InitialiseWorld()
     {
         elapsedTime = 0f;
         WorldSpeed = startSpeed;
         nextSpawnZ = 0f;
-        sideIndex = 0;
-        sideCount = 0;
 
         ClearAll();
 
-        SpawnTile(firstTilePrefab ?? roadTilePrefabs[0], nextSpawnZ);
-        SpawnSide(nextSpawnZ);
-        nextSpawnZ += tileLength;
+        SpawnRoadTile(firstTilePrefab ?? roadTilePrefabs[0]);
+        SpawnSideTile();
 
         while (activeRoadTiles.Count < tilesAhead)
-            SpawnNext();
+        {
+            SpawnNextPair();
+        }
     }
-
+    
     private void MoveWorld()
     {
-        worldRoot.position -= new Vector3(0, 0, WorldSpeed * Time.deltaTime);
+        worldRoot.position -= new Vector3(0f, 0f, WorldSpeed * Time.deltaTime);
     }
 
     private void TrySpawn()
     {
-
-        float frontEdge = nextSpawnZ + worldRoot.position.z;
-        while (frontEdge < tilesAhead * tileLength)
+        while (nextSpawnZ + worldRoot.position.z < tilesAhead * tileLength)
         {
-            SpawnNext();
-            frontEdge = nextSpawnZ + worldRoot.position.z;
+            SpawnNextPair();
         }
     }
 
@@ -100,13 +95,10 @@ public class TileManager : MonoBehaviour
     {
         if (activeRoadTiles.Count == 0) return;
 
-        GameObject oldest = activeRoadTiles[0];
-        float backEdge = oldest.transform.position.z;
-
-        if (backEdge < -tileLength * 2f)
+        if (activeRoadTiles[0].transform.position.z < -tileLength)
         {
+            Destroy(activeRoadTiles[0]);
             activeRoadTiles.RemoveAt(0);
-            Destroy(oldest);
 
             if (activeSideTiles.Count > 0)
             {
@@ -116,43 +108,42 @@ public class TileManager : MonoBehaviour
         }
     }
 
-    private void SpawnNext()
-    {
-        int index = Random.Range(0, roadTilePrefabs.Length);
-        SpawnTile(roadTilePrefabs[index], nextSpawnZ);
-        SpawnSide(nextSpawnZ);
-        nextSpawnZ += tileLength;
-
-        if (sideTilePrefabs.Length == 0) return;
-
-        sideCount++;
-        if (sideCount >= SIDE_CYCLE)
-        {
-            sideCount = 0;
-            sideIndex = (sideIndex + 1) % sideTilePrefabs.Length;
-        }
-    }
-
-    private void SpawnTile(GameObject prefab, float z)
-    {
-        Vector3 pos = new Vector3(0, 0, z);
-        GameObject tile = Instantiate(prefab, pos, Quaternion.identity, worldRoot);
-        activeRoadTiles.Add(tile);
-    }
-
-    private void SpawnSide(float z)
-    {
-        if (sideTilePrefabs.Length == 0) return;
-
-        Vector3 pos = new Vector3(0, 0, z);
-        GameObject side = Instantiate(sideTilePrefabs[sideIndex], pos, Quaternion.identity, worldRoot);
-        activeSideTiles.Add(side);
-    }
-
     private void UpdateSpeed()
     {
         elapsedTime += Time.deltaTime;
         WorldSpeed = Mathf.Lerp(startSpeed, maxSpeed, elapsedTime / timeToMaxSpeed);
+    }
+
+    private void SpawnNextPair()
+    {
+        int index = Random.Range(0, roadTilePrefabs.Length);
+        SpawnRoadTile(roadTilePrefabs[index]);
+        SpawnSideTile();
+    }
+
+    private void SpawnRoadTile(GameObject prefab)
+    {
+        GameObject tile = Instantiate(prefab, worldRoot);
+
+        tile.transform.localPosition = new Vector3(0f, 0f, nextSpawnZ);
+        tile.transform.localRotation = Quaternion.identity;
+        
+        activeRoadTiles.Add(tile);
+        nextSpawnZ += tileLength;
+    }
+
+    private void SpawnSideTile()
+    {
+        if (sideTilePrefabs == null || sideTilePrefabs.Length == 0) return;
+
+        float sideZ = nextSpawnZ - tileLength;
+
+        int index = Random.Range(0, sideTilePrefabs.Length);
+        GameObject side = Instantiate(sideTilePrefabs[index], worldRoot);
+        side.transform.localPosition = new Vector3(0f, 0f, sideZ);
+        side.transform.localRotation = Quaternion.identity;
+
+        activeSideTiles.Add(side);
     }
 
     private void ClearAll()
@@ -161,28 +152,22 @@ public class TileManager : MonoBehaviour
         foreach (var t in activeSideTiles) if (t) Destroy(t);
         activeRoadTiles.Clear();
         activeSideTiles.Clear();
-        nextSpawnZ = 0f;
 
+        nextSpawnZ = 0f;
         if (worldRoot) worldRoot.position = Vector3.zero;
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (scene.name == "Main Game")
-        {
-            GameObject rootObj = GameObject.FindWithTag("WorldRoot");
-            if (rootObj != null)
-                worldRoot = rootObj.transform;
-            else
-                Debug.LogError("TileManager: WorldRoot not found in scene!");
+        if (scene.name != "Main Game") return;
 
-            elapsedTime = 0f;
-            InitialiseWorld();
-        }
-    }
+        GameObject root = GameObject.FindWithTag("WorldRoot");
+        if (root != null)
+            worldRoot = root.transform;
+        else
+            Debug.LogError("TileManager: no WorldRoot found in scene.");
 
-    private void OnDestroy()
-    {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
+        elapsedTime = 0f;
+        InitialiseWorld();
     }
 }
