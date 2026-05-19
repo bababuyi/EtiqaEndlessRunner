@@ -4921,12 +4921,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aaad35cb152593d4ea1b9db4f43b26ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TileManager
-  firstTilePrefab: {fileID: 4350806020161172209, guid: 07f18d0fb76cd7849bbcd97bbe945d42, type: 3}
+  firstTilePrefab: {fileID: 5840259549913930856, guid: 9be0a0a6e5123254ba3327453324caeb, type: 3}
   roadTilePrefabs:
-  - {fileID: 4350806020161172209, guid: 07f18d0fb76cd7849bbcd97bbe945d42, type: 3}
-  - {fileID: 5840259549913930856, guid: 3e8cae200cd531049b745e3c022a402b, type: 3}
-  - {fileID: 6782839020515493749, guid: e6c7199d32c4d914cb83e1220f41f59c, type: 3}
-  - {fileID: 4021837320513784677, guid: 16cab7e96ac3c2941ad754ac3774e8d8, type: 3}
+  - {fileID: 5840259549913930856, guid: b1206ec3acc101142b9ab3040e5b09d3, type: 3}
+  - {fileID: 5840259549913930856, guid: 7b2478b0c5d00b14c85b3c89d3d1a289, type: 3}
+  - {fileID: 5840259549913930856, guid: 12b3bafd97f7ff34382d428dd74d56b2, type: 3}
+  - {fileID: 5840259549913930856, guid: 153247f74e1a40e4db9a6e51100d1f38, type: 3}
+  - {fileID: 5840259549913930856, guid: 4b486a2e687f4144f907a7656bb3b72f, type: 3}
+  - {fileID: 5840259549913930856, guid: 36b4ce4654d2d7d4ea8e8ca2069f4ead, type: 3}
+  - {fileID: 5840259549913930856, guid: 9be0a0a6e5123254ba3327453324caeb, type: 3}
+  - {fileID: 5840259549913930856, guid: d75f531458bdc334cb97e80a86cf5507, type: 3}
+  - {fileID: 5840259549913930856, guid: e33b5f8a16a50764195ac0d8172af44b, type: 3}
+  - {fileID: 5840259549913930856, guid: 145615ad07b6928419a2293ea17d0a0b, type: 3}
   sideTilePrefabs: []
   tilesAhead: 6
   tileLength: 28
