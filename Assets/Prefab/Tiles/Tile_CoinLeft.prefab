@@ -48,6 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab46c974b665ef74ebd324de73ab7e8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TilePopulator
+  allowPowerUpsOnBlockedLanes: 0
   vehiclePrefabs:
   - {fileID: 2506454859051202016, guid: 03033777d8023f243b9615154d7da74f, type: 3}
   - {fileID: 4095927731909062349, guid: 934fe7a992bd1d94ca50096dc10c8e48, type: 3}
@@ -69,12 +70,13 @@ MonoBehaviour:
   obstacleSpawnPoints: []
   powerUpLanePoints: []
   coinSpawnPoints:
+  - {fileID: 4339804765430148879}
   - {fileID: 7737168151905329073}
+  - {fileID: 4844990123411349839}
   vehicleWeight: 0.5
   jumpObstacleWeight: 0.25
-  powerUpSpawnChance: 0.65
-  coinSpawnChance: 0.8
-  guaranteeFirstTile: 0
+  powerUpChance: 0.1
+  coinChance: 0.8
 --- !u!1001 &569782433498971852
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -364,9 +366,23 @@ PrefabInstance:
     m_RemovedGameObjects:
     - {fileID: 3054005009932087931, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
     - {fileID: 4980351042141539943, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
+    - {fileID: 642910588961912456, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
+    - {fileID: 2992829050605599767, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
+    - {fileID: 7518581956644870906, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
+    - {fileID: 3034934425119045724, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
+--- !u!4 &4339804765430148879 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6645099195604297955, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
+  m_PrefabInstance: {fileID: 6918153490203707372}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &4844990123411349839 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2539725809448199843, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
+  m_PrefabInstance: {fileID: 6918153490203707372}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7737168151905329073 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 819028972539009117, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}

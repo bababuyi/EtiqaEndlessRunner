@@ -28,8 +28,8 @@ public class TilePopulator : MonoBehaviour
     [SerializeField] private Transform[] coinSpawnPoints;
 
     [Header("Obstacle Type Weights  (should sum to <= 1)")]
-    [SerializeField][Range(0f, 1f)] private float vehicleWeight = 0.50f;
-    [SerializeField][Range(0f, 1f)] private float jumpObstacleWeight = 0.25f;
+    [SerializeField][Range(0f, 1f)] private float vehicleWeight = 0.70f;
+    [SerializeField][Range(0f, 1f)] private float jumpObstacleWeight = 0.15f;
 
 
     [Header("Spawn Chances")]

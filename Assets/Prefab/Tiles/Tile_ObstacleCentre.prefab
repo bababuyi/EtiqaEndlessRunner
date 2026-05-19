@@ -48,6 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab46c974b665ef74ebd324de73ab7e8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TilePopulator
+  allowPowerUpsOnBlockedLanes: 0
   vehiclePrefabs:
   - {fileID: 2506454859051202016, guid: 03033777d8023f243b9615154d7da74f, type: 3}
   - {fileID: 4095927731909062349, guid: 934fe7a992bd1d94ca50096dc10c8e48, type: 3}
@@ -78,13 +79,16 @@ MonoBehaviour:
   - {fileID: 2340487356745683756}
   - {fileID: 4959691711091760327}
   coinSpawnPoints:
+  - {fileID: 801938334740087062}
+  - {fileID: 8069076687341404460}
   - {fileID: 6648696968559800744}
   - {fileID: 322461993591135957}
+  - {fileID: 8369877246407921494}
+  - {fileID: 3601202897717609832}
   vehicleWeight: 0.5
   jumpObstacleWeight: 0.25
-  powerUpSpawnChance: 0.65
-  coinSpawnChance: 0.8
-  guaranteeFirstTile: 0
+  powerUpChance: 0.1
+  coinChance: 0.8
 --- !u!1001 &569782433498971852
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -409,12 +413,24 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 3054005009932087931, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
+    - {fileID: 642910588961912456, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
+    - {fileID: 7518581956644870906, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
 --- !u!4 &322461993591135957 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6007996868579669792, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
+  m_PrefabInstance: {fileID: 6276096108154972661}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &801938334740087062 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6645099195604297955, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
+  m_PrefabInstance: {fileID: 6276096108154972661}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &3601202897717609832 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7413812141747678365, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
   m_PrefabInstance: {fileID: 6276096108154972661}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &4864370869122373200 stripped
@@ -425,5 +441,15 @@ Transform:
 --- !u!4 &6648696968559800744 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 819028972539009117, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
+  m_PrefabInstance: {fileID: 6276096108154972661}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &8069076687341404460 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4098893958771845337, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
+  m_PrefabInstance: {fileID: 6276096108154972661}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &8369877246407921494 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2539725809448199843, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
   m_PrefabInstance: {fileID: 6276096108154972661}
   m_PrefabAsset: {fileID: 0}

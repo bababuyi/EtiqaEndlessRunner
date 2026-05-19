@@ -48,6 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab46c974b665ef74ebd324de73ab7e8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TilePopulator
+  allowPowerUpsOnBlockedLanes: 0
   vehiclePrefabs:
   - {fileID: 2506454859051202016, guid: 03033777d8023f243b9615154d7da74f, type: 3}
   - {fileID: 4095927731909062349, guid: 934fe7a992bd1d94ca50096dc10c8e48, type: 3}
@@ -87,12 +88,13 @@ MonoBehaviour:
   - {fileID: 2340487356745683756}
   - {fileID: 4959691711091760327}
   coinSpawnPoints:
+  - {fileID: 6311483879776082005}
   - {fileID: 4329197435481409452}
+  - {fileID: 691286790864526353}
   vehicleWeight: 0.5
   jumpObstacleWeight: 0.25
-  powerUpSpawnChance: 0.65
-  coinSpawnChance: 0.8
-  guaranteeFirstTile: 0
+  powerUpChance: 0.1
+  coinChance: 0.8
 --- !u!1001 &569782433498971852
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -418,12 +420,26 @@ PrefabInstance:
     m_RemovedGameObjects:
     - {fileID: 1279667230591577453, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
     - {fileID: 3054005009932087931, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
+    - {fileID: 642910588961912456, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
+    - {fileID: 8319879409423347740, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
+    - {fileID: 7518581956644870906, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
+    - {fileID: 8620116896588302311, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
+--- !u!4 &691286790864526353 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7413812141747678365, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
+  m_PrefabInstance: {fileID: 8031280914015154316}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &4329197435481409452 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6007996868579669792, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
+  m_PrefabInstance: {fileID: 8031280914015154316}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &6311483879776082005 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4098893958771845337, guid: d89e085c5b9739c48966f20f707d6eb8, type: 3}
   m_PrefabInstance: {fileID: 8031280914015154316}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &8929596619557080873 stripped

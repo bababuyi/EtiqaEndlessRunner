@@ -143,17 +143,15 @@ public class Movement : MonoBehaviour
 
         isRolling = true;
 
-        float originalHeight = playerCollider.height;
-        Vector3 originalCenter = playerCollider.center;
+        playerCollider.height = originalColliderSize.y * 0.5f;
+        playerCollider.center = new Vector3(originalColliderCenter.x, 0.76f, originalColliderCenter.z);
 
-        playerCollider.height *= 0.5f;
-        playerCollider.center = new Vector3(playerCollider.center.x, 1f, playerCollider.center.z);
         TileManager.Instance.WorldSpeed *= rollSpeedMultiplier;
 
         yield return new WaitForSeconds(rollDuration);
 
-        playerCollider.height = originalHeight;
-        playerCollider.center = originalCenter;
+        playerCollider.height = originalColliderSize.y;
+        playerCollider.center = originalColliderCenter;
         TileManager.Instance.WorldSpeed /= rollSpeedMultiplier;
 
         isRolling = false;

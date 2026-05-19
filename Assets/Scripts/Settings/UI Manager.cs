@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
@@ -10,12 +10,16 @@ public class UIManager : MonoBehaviour
     public static UIManager Instance { get; private set; }
 
     [Header("HUD")]
+    [SerializeField] private GameObject hudPanel;
     [SerializeField] private TextMeshProUGUI scoreText;
     [SerializeField] private TextMeshProUGUI coinText;
+    [SerializeField] private TextMeshProUGUI distanceText;
+    [SerializeField] private TextMeshProUGUI hpText;
 
     [Header("Game Over Panel")]
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private TextMeshProUGUI finalScoreText;
+    [SerializeField] private TextMeshProUGUI finalDistanceText;
     [SerializeField] private TextMeshProUGUI coinsCollectedText;
 
     [Header("Pause Menu Panel")]
@@ -26,19 +30,13 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Toggle soundToggle;
     [SerializeField] private Slider volumeSlider;
 
+    [Header("Main Menu")]
+    [SerializeField] private GameObject mainMenuPanel;
     #region Unity Lifecycle
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-            return;
-        }
+        Instance = this;
     }
 
     private void Start()
@@ -46,6 +44,9 @@ public class UIManager : MonoBehaviour
         SubscribeToGameManager();
         InitialiseSettingsPanel();
         HideAllPanels();
+
+        if (SceneManager.GetActiveScene().name == "Main Game")
+            ResetHUD();
     }
 
     private void Update()
@@ -69,7 +70,9 @@ public class UIManager : MonoBehaviour
         GameManager.Instance.OnGameOver += HandleGameOver;
         GameManager.Instance.OnGamePaused += HandleGamePaused;
         GameManager.Instance.OnGameResumed += HandleGameResumed;
-        GameManager.Instance.OnGameRestarted += HideAllPanels;
+        GameManager.Instance.OnGameRestarted += HandleGameRestarted;
+        GameManager.Instance.OnDistanceUpdated += HandleDistanceUpdated;
+        GameManager.Instance.OnHealthChanged += HandleHealthChanged;
     }
 
     private void UnsubscribeFromGameManager()
@@ -81,12 +84,14 @@ public class UIManager : MonoBehaviour
         GameManager.Instance.OnGameOver -= HandleGameOver;
         GameManager.Instance.OnGamePaused -= HandleGamePaused;
         GameManager.Instance.OnGameResumed -= HandleGameResumed;
-        GameManager.Instance.OnGameRestarted -= HideAllPanels;
+        GameManager.Instance.OnGameRestarted -= HandleGameRestarted;
+        GameManager.Instance.OnDistanceUpdated -= HandleDistanceUpdated;
+        GameManager.Instance.OnHealthChanged -= HandleHealthChanged;
     }
 
     #endregion
 
-    #region HUD Handlers
+    #region HUD
 
     private void HandleScoreUpdated(int score)
     {
@@ -100,21 +105,46 @@ public class UIManager : MonoBehaviour
             coinText.text = "Coins: " + coins;
     }
 
+    private void HandleDistanceUpdated(float metres)
+    {
+        if (distanceText != null)
+            distanceText.text = Mathf.FloorToInt(metres) + "m";
+    }
+
+    private void HandleHealthChanged(int current, int max)
+    {
+        if (hpText != null)
+            hpText.text = "HP: " + new string('♥', current).PadRight(max, '♡');
+    }
+
+    private void ResetHUD()
+    {
+        if (hudPanel != null) hudPanel.SetActive(true);
+
+        if (scoreText != null) scoreText.text = "Score: 0";
+        if (coinText != null) coinText.text = "Coins: 0";
+        if (distanceText != null) distanceText.text = "0m";
+        if (hpText != null) hpText.text = "HP: --";
+    }
+
     #endregion
 
     #region Game Over Panel
 
     private void HandleGameOver(int finalScore, int totalCoins)
     {
+        hudPanel?.SetActive(false);
         gameOverPanel?.SetActive(true);
 
         if (finalScoreText != null)
             finalScoreText.text = "Final Score: " + finalScore;
 
+        if (finalDistanceText != null)
+            finalDistanceText.text = "Distance: " + Mathf.FloorToInt(GameManager.Instance.DistanceMetres) + "m";
+
         if (coinsCollectedText != null)
             coinsCollectedText.text = "Coins Collected: " + totalCoins;
     }
-
 
     public void OnRestartButton()
     {
@@ -158,7 +188,7 @@ public class UIManager : MonoBehaviour
 
     private void HandleGameResumed()
     {
-        pauseMenuPanel?.SetActive(false);
+        if (pauseMenuPanel != null) pauseMenuPanel.SetActive(false);
         settingsPanel?.SetActive(false);
     }
 
@@ -168,11 +198,31 @@ public class UIManager : MonoBehaviour
         GameManager.Instance?.ResumeGame();
     }
 
-    public void OnOpenSettingsFromPauseButton()
+    public void OnOpenSettingsButton()
     {
         AudioManager.Instance?.PlayButtonClick();
-        pauseMenuPanel?.SetActive(false);
-        settingsPanel?.SetActive(true);
+        if (pauseMenuPanel != null) pauseMenuPanel.SetActive(false);
+        if (mainMenuPanel != null) mainMenuPanel.SetActive(false); // hide main menu
+        if (settingsPanel != null) settingsPanel.SetActive(true);
+    }
+
+    public void OnCloseSettingsButton()
+    {
+        AudioManager.Instance?.PlayButtonClick();
+        if (settingsPanel != null) settingsPanel.SetActive(false);
+
+        bool returnToPause = SceneManager.GetActiveScene().name == "Main Game"
+                          && GameManager.Instance != null
+                          && GameManager.Instance.CurrentState == GameManager.GameState.Paused;
+
+        if (returnToPause)
+        {
+            if (pauseMenuPanel != null) pauseMenuPanel.SetActive(true);
+        }
+        else
+        {
+            if (mainMenuPanel != null) mainMenuPanel.SetActive(true); // restore main menu
+        }
     }
 
     public void OnMainMenuFromPauseButton()
@@ -225,27 +275,21 @@ public class UIManager : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    public void OnCloseSettingsButton()
-    {
-        AudioManager.Instance?.PlayButtonClick();
-        settingsPanel?.SetActive(false);
-
-        bool returnToPause = SceneManager.GetActiveScene().name == "Main Game"
-                          && GameManager.Instance.CurrentState == GameManager.GameState.Paused;
-
-        if (returnToPause)
-            pauseMenuPanel?.SetActive(true);
-    }
-
     #endregion
 
     #region Utility
 
+    private void HandleGameRestarted()
+    {
+        HideAllPanels();
+        ResetHUD();
+    }
+
     private void HideAllPanels()
     {
-        gameOverPanel?.SetActive(false);
-        pauseMenuPanel?.SetActive(false);
-        settingsPanel?.SetActive(false);
+        if (gameOverPanel != null) gameOverPanel.SetActive(false);
+        if (pauseMenuPanel != null) pauseMenuPanel.SetActive(false);
+        if (settingsPanel != null) settingsPanel.SetActive(false);
     }
 
     #endregion

@@ -1,9 +1,34 @@
 fileFormatVersion: 2
-guid: f7d5d09a340e069448244a234702a7b4
+guid: bc594878cd9daa24a98bd0bfb66d009b
 ModelImporter:
-  serializedVersion: 22200
+  serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Laces
+    second: {fileID: 2100000, guid: 3e7712149f033d244af185ac8bbaca1c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Shoe sole
+    second: {fileID: 2100000, guid: 3f8d6233eca3f064ba4f1754eb2bb0e0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Stiches
+    second: {fileID: 2100000, guid: bf52df63cf0d41b4b83cfc11a50719cb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Tag
+    second: {fileID: 2100000, guid: d810d6d80cf7a4746947af6d17fddc4c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Upper
+    second: {fileID: 2100000, guid: 48b59a956c1862a4687acbc2642241bb, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -16,8 +41,6 @@ ModelImporter:
     optimizeGameObjects: 0
     removeConstantScaleCurves: 0
     motionNodeName: 
-    rigImportErrors: 
-    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
@@ -58,6 +81,9 @@ ModelImporter:
     maxBonesPerVertex: 4
     minBoneWeight: 0.001
     optimizeBones: 1
+    generateMeshLods: 0
+    meshLodGenerationFlags: 0
+    maximumMeshLod: -1
     meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8

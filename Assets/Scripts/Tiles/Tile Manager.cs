@@ -12,10 +12,17 @@ public class TileManager : MonoBehaviour
     public class TileEntry
     {
         public GameObject prefab;
-        [Range(0, 3)] public int difficulty; // 0=Easy  1=Medium  2=Hard  3=Brutal
+        [Range(0, 3)] public int difficulty;
     }
     [SerializeField] private TileEntry[] roadTiles;
+
+    [Header("Side Buildings")]
     [SerializeField] private GameObject[] sideTilePrefabs;
+    [SerializeField] private float buildingSpacing = 8.26f;
+    [SerializeField] private float buildingXOffset = 4.78f;
+    [SerializeField] private float buildingYOffset = 4.06f;
+
+    private float nextBuildingZ = 0f;
 
     [Header("Settings")]
     [SerializeField] private int tilesAhead = 6;
@@ -96,17 +103,17 @@ public class TileManager : MonoBehaviour
         elapsedTime = 0f;
         WorldSpeed = startSpeed;
         nextSpawnZ = 0f;
+        nextBuildingZ = 0f;
 
         ClearAll();
 
         GameObject firstTile = SpawnRoadTile(firstTilePrefab ?? roadTiles[0].prefab);
-        SpawnSideTile();
+        SpawnSideBuildings();
 
         float measured = MeasureTileLength(firstTile);
         if (measured > 0.1f)
         {
             tileLength = measured;
-
             nextSpawnZ = tileLength;
         }
 
@@ -133,20 +140,26 @@ public class TileManager : MonoBehaviour
     {
         if (activeRoadTiles.Count == 0) return;
 
-        GameObject oldestTile = activeRoadTiles[0];
-        float tileLocalZ = oldestTile.transform.localPosition.z;
         float scrollOffset = -worldRoot.position.z;
 
-        if (tileLocalZ < scrollOffset - tileLength)
+        GameObject oldestTile = activeRoadTiles[0];
+        if (oldestTile.transform.localPosition.z < scrollOffset - tileLength)
         {
             Destroy(oldestTile);
             activeRoadTiles.RemoveAt(0);
+        }
 
-            if (activeSideTiles.Count > 0)
+        while (activeSideTiles.Count > 0)
+        {
+            GameObject oldest = activeSideTiles[0];
+            if (oldest == null) { activeSideTiles.RemoveAt(0); continue; }
+
+            if (oldest.transform.localPosition.z < scrollOffset - tileLength)
             {
-                Destroy(activeSideTiles[0]);
+                Destroy(oldest);
                 activeSideTiles.RemoveAt(0);
             }
+            else break;
         }
     }
 
@@ -243,7 +256,7 @@ public class TileManager : MonoBehaviour
     private void SpawnNextPair()
     {
         SpawnRoadTile(PickRandomTile());
-        SpawnSideTile();
+        SpawnSideBuildings();
     }
 
     private GameObject SpawnRoadTile(GameObject prefab)
@@ -275,18 +288,28 @@ public class TileManager : MonoBehaviour
         return measured;
     }
 
-    private void SpawnSideTile()
+    [SerializeField] private float sideXOffset = 15f;
+
+    private void SpawnSideBuildings()
     {
         if (sideTilePrefabs == null || sideTilePrefabs.Length == 0) return;
 
-        float sideZ = nextSpawnZ - tileLength;
+        while (nextBuildingZ < nextSpawnZ)
+        {
+            // Right side
+            GameObject right = Instantiate(sideTilePrefabs[Random.Range(0, sideTilePrefabs.Length)], worldRoot);
+            right.transform.localPosition = new Vector3(buildingXOffset, buildingYOffset, nextBuildingZ);
+            right.transform.localRotation = Quaternion.Euler(-90f, 180f, 90f);
+            activeSideTiles.Add(right);
 
-        int index = Random.Range(0, sideTilePrefabs.Length);
-        GameObject side = Instantiate(sideTilePrefabs[index], worldRoot);
-        side.transform.localPosition = new Vector3(0f, 0f, sideZ);
-        side.transform.localRotation = Quaternion.identity;
+            // Left side
+            GameObject left = Instantiate(sideTilePrefabs[Random.Range(0, sideTilePrefabs.Length)], worldRoot);
+            left.transform.localPosition = new Vector3(-buildingXOffset, buildingYOffset, nextBuildingZ);
+            left.transform.localRotation = Quaternion.Euler(-90f, 0f, 90f);
+            activeSideTiles.Add(left);
 
-        activeSideTiles.Add(side);
+            nextBuildingZ += buildingSpacing;
+        }
     }
 
     private void ClearAll()
@@ -297,6 +320,7 @@ public class TileManager : MonoBehaviour
         activeSideTiles.Clear();
 
         nextSpawnZ = 0f;
+        nextBuildingZ = 0f; // add this
         if (worldRoot) worldRoot.position = Vector3.zero;
     }
 

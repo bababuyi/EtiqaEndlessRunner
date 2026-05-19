@@ -1,5 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
 using System.Collections;
+using UnityEngine;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -11,6 +12,10 @@ public class PlayerHealth : MonoBehaviour
 
     private bool isHurt = false;
     private bool isInvincible = false;
+
+    public event Action<int, int> OnHealthChanged;
+    public int MaxHP { get; private set; } = 2;
+    public int CurrentHP { get; private set; }
 
     void Start()
     {
@@ -47,6 +52,8 @@ public class PlayerHealth : MonoBehaviour
     {
         if (isHurt)
         {
+            CurrentHP = 0;
+            OnHealthChanged?.Invoke(CurrentHP, MaxHP);
             Debug.Log("Player hit again within hit window! GAME OVER.");
  
             AudioManager.Instance?.PlayHit();
@@ -55,6 +62,10 @@ public class PlayerHealth : MonoBehaviour
             GameOver();
             yield break;
         }
+
+        isHurt = true;
+        CurrentHP = 1;
+        OnHealthChanged?.Invoke(CurrentHP, MaxHP);
 
         Debug.Log("Player stumbled! Speed reduced.");
         isHurt = true;

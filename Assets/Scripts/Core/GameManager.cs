@@ -17,13 +17,18 @@ public class GameManager : MonoBehaviour
     public event Action OnGamePaused;
     public event Action OnGameResumed;
     public event Action OnGameRestarted;
+    public event Action<float> OnDistanceUpdated;
+    public event Action<int, int> OnHealthChanged;
+
+    public float DistanceMetres { get; private set; }
 
     public enum GameState { Playing, Paused, GameOver }
     public GameState CurrentState { get; private set; } = GameState.Playing;
 
     [Header("Score")]
     [SerializeField] private float scoreMultiplier = 1f;
-
+    public int CurrentHealth { get; private set; }
+    public int MaxHealth { get; private set; }
     public int CurrentScore { get; private set; }
     public static int FinalScore { get; private set; }
 
@@ -78,6 +83,7 @@ public class GameManager : MonoBehaviour
 
         CurrentState = GameState.Playing;
         CurrentScore = 0;
+        DistanceMetres = 0f;
         doublePointsActive = false;
         CachePlayer();
     }
@@ -85,15 +91,20 @@ public class GameManager : MonoBehaviour
     private void CachePlayer()
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null) { Debug.LogWarning("GameManager: No Player found."); return; }
 
-        if (player != null)
+        playerTransform = player.transform;
+        lastPlayerPosition = playerTransform.position;
+
+        var health = player.GetComponent<PlayerHealth>();
+        if (health != null)
         {
-            playerTransform = player.transform;
-            lastPlayerPosition = playerTransform.position;
-        }
-        else
-        {
-            Debug.LogWarning("GameManager: No Player found in scene.");
+            health.OnHealthChanged += (cur, max) =>
+            {
+                CurrentHealth = cur;
+                MaxHealth = max;
+                OnHealthChanged?.Invoke(cur, max);
+            };
         }
     }
 
@@ -105,7 +116,12 @@ public class GameManager : MonoBehaviour
     {
         if (TileManager.Instance == null) return;
 
-        float scoreGain = TileManager.Instance.WorldSpeed * scoreMultiplier * Time.deltaTime;
+        float speed = TileManager.Instance.WorldSpeed;
+
+        DistanceMetres += speed * Time.deltaTime;
+        OnDistanceUpdated?.Invoke(DistanceMetres);
+
+        float scoreGain = speed * scoreMultiplier * Time.deltaTime;
         int updated = CurrentScore + Mathf.RoundToInt(scoreGain);
 
         if (updated != CurrentScore)
