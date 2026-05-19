@@ -96,6 +96,7 @@ MonoBehaviour:
   - {fileID: 7976205392844934891, guid: 7f7ef90ff5d001a4bbd6f609b12edff5, type: 3}
   - {fileID: 2934514363009498231, guid: e6e44385e907ec040a2823e35f1c8d3d, type: 3}
   - {fileID: 5002783985998980343, guid: 8809d36035438e04f9232907ce263d00, type: 3}
+  coinPrefab: {fileID: 8007812347585689680, guid: f2bca4ac44435124caa069e6bf836b6c, type: 3}
   obstacleSpawnPoints:
   - {fileID: 0}
   - {fileID: 0}
@@ -116,9 +117,11 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  coinSpawnPoints: []
   vehicleWeight: 0.5
   jumpObstacleWeight: 0.25
   powerUpSpawnChance: 0.65
+  coinSpawnChance: 0.8
   guaranteeFirstTile: 0
 --- !u!1001 &569782433498971852
 PrefabInstance:

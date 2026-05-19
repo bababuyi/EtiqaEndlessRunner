@@ -8,7 +8,13 @@ public class TileManager : MonoBehaviour
 
     [Header("Tile Prefabs")]
     [SerializeField] private GameObject firstTilePrefab;
-    [SerializeField] private GameObject[] roadTilePrefabs;
+    [System.Serializable]
+    public class TileEntry
+    {
+        public GameObject prefab;
+        [Range(0, 3)] public int difficulty; // 0=Easy  1=Medium  2=Hard  3=Brutal
+    }
+    [SerializeField] private TileEntry[] roadTiles;
     [SerializeField] private GameObject[] sideTilePrefabs;
 
     [Header("Settings")]
@@ -17,6 +23,11 @@ public class TileManager : MonoBehaviour
     [SerializeField] private float startSpeed = 8f;
     [SerializeField] private float maxSpeed = 22f;
     [SerializeField] private float timeToMaxSpeed = 120f;
+    [SerializeField][Range(0f, 1f)] private float transitionInfluence = 0.5f;
+
+    [Header("Difficulty Progression")]
+    [SerializeField] private int hardTilesBeforeBreather = 5;
+    [SerializeField] private int breatherLength = 3;
 
     [Header("References")]
     [SerializeField] private Transform worldRoot;
@@ -25,6 +36,20 @@ public class TileManager : MonoBehaviour
 
     private float nextSpawnZ;
     private float elapsedTime;
+    private int consecutiveHardTiles = 0;
+    private int breatherTilesLeft = 0;
+    private int lastTileDifficulty = 0;
+
+    private static readonly float[] EarlyWeights = { 0.70f, 0.25f, 0.05f, 0.00f };
+    private static readonly float[] LateWeights = { 0.05f, 0.15f, 0.50f, 0.30f };
+
+    private static readonly float[,] TransitionWeights =
+    {
+        { 0.50f, 0.35f, 0.15f, 0.00f },
+        { 0.25f, 0.40f, 0.30f, 0.05f },
+        { 0.10f, 0.50f, 0.30f, 0.10f },
+        { 0.05f, 0.40f, 0.40f, 0.15f },
+    };
 
     private readonly List<GameObject> activeRoadTiles = new();
     private readonly List<GameObject> activeSideTiles = new();
@@ -74,7 +99,7 @@ public class TileManager : MonoBehaviour
 
         ClearAll();
 
-        GameObject firstTile = SpawnRoadTile(firstTilePrefab ?? roadTilePrefabs[0]);
+        GameObject firstTile = SpawnRoadTile(firstTilePrefab ?? roadTiles[0].prefab);
         SpawnSideTile();
 
         float measured = MeasureTileLength(firstTile);
@@ -133,18 +158,86 @@ public class TileManager : MonoBehaviour
 
     private GameObject PickRandomTile()
     {
-        int random = Random.Range(0, 100);
+        float t = Mathf.Clamp01(elapsedTime / timeToMaxSpeed);
 
-        if (random < 40)
-            return roadTilePrefabs[0];
+        if (breatherTilesLeft > 0)
+        {
+            breatherTilesLeft--;
+            if (breatherTilesLeft == 0) consecutiveHardTiles = 0;
+            GameObject breatherTile = PickTileOfDifficulty(0, t);
+            lastTileDifficulty = 0;
+            return breatherTile;
+        }
 
-        if (random < 70)
-            return roadTilePrefabs[1];
+        GameObject picked = PickWeightedTile(t);
 
-        if (random < 90)
-            return roadTilePrefabs[2];
+        int difficulty = GetDifficulty(picked);
+        lastTileDifficulty = difficulty;
 
-        return roadTilePrefabs[3];
+        if (difficulty >= 2)
+        {
+            consecutiveHardTiles++;
+            if (consecutiveHardTiles >= hardTilesBeforeBreather)
+                breatherTilesLeft = breatherLength;
+        }
+        else
+        {
+            consecutiveHardTiles = 0;
+        }
+
+        return picked;
+    }
+
+    private GameObject PickWeightedTile(float t)
+    {
+        var weightedPool = new List<(GameObject prefab, float weight)>();
+        float totalWeight = 0f;
+
+        foreach (TileEntry entry in roadTiles)
+        {
+            if (entry.prefab == null) continue;
+
+            float timeWeight = Mathf.Lerp(EarlyWeights[entry.difficulty], LateWeights[entry.difficulty], t);
+            float transitionWeight = TransitionWeights[lastTileDifficulty, entry.difficulty];
+            float blended = Mathf.Lerp(timeWeight, transitionWeight, transitionInfluence);
+
+            weightedPool.Add((entry.prefab, blended));
+            totalWeight += blended;
+        }
+
+        if (weightedPool.Count == 0) return null;
+
+        float roll = Random.value * totalWeight;
+        float cumulative = 0f;
+
+        foreach (var (prefab, weight) in weightedPool)
+        {
+            cumulative += weight;
+            if (roll <= cumulative) return prefab;
+        }
+
+        return weightedPool[^1].prefab;
+    }
+
+    private GameObject PickTileOfDifficulty(int targetDifficulty, float t)
+    {
+        var matches = new List<GameObject>();
+
+        foreach (TileEntry entry in roadTiles)
+            if (entry.prefab != null && entry.difficulty == targetDifficulty)
+                matches.Add(entry.prefab);
+
+        if (matches.Count > 0)
+            return matches[Random.Range(0, matches.Count)];
+
+        return PickWeightedTile(t);
+    }
+
+    private int GetDifficulty(GameObject prefab)
+    {
+        foreach (TileEntry entry in roadTiles)
+            if (entry.prefab == prefab) return entry.difficulty;
+        return 0;
     }
 
     private void SpawnNextPair()

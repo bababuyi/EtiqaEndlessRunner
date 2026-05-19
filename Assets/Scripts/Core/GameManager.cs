@@ -33,7 +33,6 @@ public class GameManager : MonoBehaviour
     public int TotalCoins { get; private set; }
 
     private bool doublePointsActive;
-    private float doublePointsEndTime;
 
     #region Unity Lifecycle
 
@@ -62,7 +61,6 @@ public class GameManager : MonoBehaviour
         if (CurrentState != GameState.Playing) return;
 
         TrackScore();
-        TickDoublePoints();
     }
 
     private void OnDestroy()
@@ -154,19 +152,12 @@ public class GameManager : MonoBehaviour
 
     #region Power-Ups
 
-    public void ActivateDoublePoints(float duration)
+    public void SetDoublePoints(bool active)
     {
-        doublePointsActive = true;
-        doublePointsEndTime = Time.time + duration;
+        doublePointsActive = active;
     }
 
     public bool IsDoublePointsActive() => doublePointsActive;
-
-    private void TickDoublePoints()
-    {
-        if (doublePointsActive && Time.time > doublePointsEndTime)
-            doublePointsActive = false;
-    }
 
     #endregion
 

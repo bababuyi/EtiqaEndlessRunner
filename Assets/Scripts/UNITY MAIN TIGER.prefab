@@ -194,6 +194,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 225dc698c8558ea448e5c9a3bddc7dc4, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1587513068586019958}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 225dc698c8558ea448e5c9a3bddc7dc4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8599022687609564887}
   m_SourcePrefab: {fileID: 100100000, guid: 225dc698c8558ea448e5c9a3bddc7dc4, type: 3}
 --- !u!4 &1216492326270758118 stripped
 Transform:
@@ -267,9 +270,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81494427be049d544b7d871f80059545, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forwardSpeed: 5
-  maxSpeed: 15
-  speedIncreaseDuration: 150
   laneDistance: 3
   laneSwitchSpeed: 10
   jumpForce: 7
@@ -291,7 +291,6 @@ MonoBehaviour:
   speedReduction: 3
   recoveryTime: 1
   hitWindow: 1
-  invincibilityDuration: 5
 --- !u!114 &1587513068586019958
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -304,3 +303,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31597c8002858534d902c8b6221863b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &8599022687609564887
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1993416779273811548}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 496bdaff1c9ff004fab968a8832c55da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PowerUpManager

@@ -4922,23 +4922,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TileManager
   firstTilePrefab: {fileID: 5840259549913930856, guid: 9be0a0a6e5123254ba3327453324caeb, type: 3}
-  roadTilePrefabs:
-  - {fileID: 5840259549913930856, guid: b1206ec3acc101142b9ab3040e5b09d3, type: 3}
-  - {fileID: 5840259549913930856, guid: 7b2478b0c5d00b14c85b3c89d3d1a289, type: 3}
-  - {fileID: 5840259549913930856, guid: 12b3bafd97f7ff34382d428dd74d56b2, type: 3}
-  - {fileID: 5840259549913930856, guid: 153247f74e1a40e4db9a6e51100d1f38, type: 3}
-  - {fileID: 5840259549913930856, guid: 4b486a2e687f4144f907a7656bb3b72f, type: 3}
-  - {fileID: 5840259549913930856, guid: 36b4ce4654d2d7d4ea8e8ca2069f4ead, type: 3}
-  - {fileID: 5840259549913930856, guid: 9be0a0a6e5123254ba3327453324caeb, type: 3}
-  - {fileID: 5840259549913930856, guid: d75f531458bdc334cb97e80a86cf5507, type: 3}
-  - {fileID: 5840259549913930856, guid: e33b5f8a16a50764195ac0d8172af44b, type: 3}
-  - {fileID: 5840259549913930856, guid: 145615ad07b6928419a2293ea17d0a0b, type: 3}
+  roadTiles:
+  - prefab: {fileID: 5840259549913930856, guid: 145615ad07b6928419a2293ea17d0a0b, type: 3}
+    difficulty: 0
+  - prefab: {fileID: 5840259549913930856, guid: e33b5f8a16a50764195ac0d8172af44b, type: 3}
+    difficulty: 0
+  - prefab: {fileID: 5840259549913930856, guid: d75f531458bdc334cb97e80a86cf5507, type: 3}
+    difficulty: 0
+  - prefab: {fileID: 5840259549913930856, guid: 9be0a0a6e5123254ba3327453324caeb, type: 3}
+    difficulty: 0
+  - prefab: {fileID: 5840259549913930856, guid: e5d5f8953809337429891ec2ba84adbf, type: 3}
+    difficulty: 3
+  - prefab: {fileID: 5840259549913930856, guid: b1206ec3acc101142b9ab3040e5b09d3, type: 3}
+    difficulty: 1
+  - prefab: {fileID: 5840259549913930856, guid: 7b2478b0c5d00b14c85b3c89d3d1a289, type: 3}
+    difficulty: 1
+  - prefab: {fileID: 5840259549913930856, guid: 12b3bafd97f7ff34382d428dd74d56b2, type: 3}
+    difficulty: 1
+  - prefab: {fileID: 5840259549913930856, guid: 153247f74e1a40e4db9a6e51100d1f38, type: 3}
+    difficulty: 2
+  - prefab: {fileID: 5840259549913930856, guid: 4b486a2e687f4144f907a7656bb3b72f, type: 3}
+    difficulty: 2
+  - prefab: {fileID: 5840259549913930856, guid: 36b4ce4654d2d7d4ea8e8ca2069f4ead, type: 3}
+    difficulty: 2
   sideTilePrefabs: []
   tilesAhead: 6
   tileLength: 28
   startSpeed: 8
   maxSpeed: 22
   timeToMaxSpeed: 120
+  hardTilesBeforeBreather: 5
+  breatherLength: 3
   worldRoot: {fileID: 189575406}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

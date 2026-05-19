@@ -62,7 +62,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: a1b66c9672907964dad802232fd37911, type: 3}
       propertyPath: m_Name
-      value: 2xModel
+      value: DoublePoints
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -71,6 +71,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a1b66c9672907964dad802232fd37911, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2961331156090292828}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: a1b66c9672907964dad802232fd37911, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4741605751977771048}
   m_SourcePrefab: {fileID: 100100000, guid: a1b66c9672907964dad802232fd37911, type: 3}
 --- !u!1 &3341741784140638179 stripped
 GameObject:
@@ -92,9 +95,23 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
   m_Radius: 0.06606772
   m_Center: {x: -0, y: 0.05536511, z: 0}
+--- !u!114 &4741605751977771048
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3341741784140638179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0f355347849adc48ac44e3b206ec7fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DoublePointsPowerUp
+  rotationSpeed: 100
+  duration: 5

@@ -32,6 +32,8 @@ public class Movement : MonoBehaviour
     private Vector3 originalColliderSize;
     private Vector3 originalColliderCenter;
     private float defaultGravity;
+    private Coroutine _flyCoroutine;
+    private float _groundY;
 
     void Start()
     {
@@ -135,54 +137,78 @@ public class Movement : MonoBehaviour
         isJumping = false;
     }
 
-    // Handles rolling
     IEnumerator Roll()
     {
-        if (!isRolling)
-        {
-            isRolling = true;
+        if (isRolling || isFlying) yield break;
 
-            float originalHeight = playerCollider.height;
-            Vector3 originalCenter = playerCollider.center;
+        isRolling = true;
 
-            playerCollider.height *= 0.5f;
-            playerCollider.center = new Vector3(playerCollider.center.x, 1f, playerCollider.center.z);
-            TileManager.Instance.WorldSpeed *= rollSpeedMultiplier;
+        float originalHeight = playerCollider.height;
+        Vector3 originalCenter = playerCollider.center;
 
-            yield return new WaitForSeconds(rollDuration);
+        playerCollider.height *= 0.5f;
+        playerCollider.center = new Vector3(playerCollider.center.x, 1f, playerCollider.center.z);
+        TileManager.Instance.WorldSpeed *= rollSpeedMultiplier;
 
-            playerCollider.height = originalHeight;
-            playerCollider.center = originalCenter;
-            TileManager.Instance.WorldSpeed /= rollSpeedMultiplier;
+        yield return new WaitForSeconds(rollDuration);
 
-            isRolling = false;
-        }
+        playerCollider.height = originalHeight;
+        playerCollider.center = originalCenter;
+        TileManager.Instance.WorldSpeed /= rollSpeedMultiplier;
+
+        isRolling = false;
     }
 
-    // Activates Flying Power-Up (if needed)
-    public void ActivateFlyingPowerUp(float flightHeight, float duration)
+    public void StartFlying(float height)
     {
-        if (!isFlying)
-        {
-            StartCoroutine(Fly(flightHeight, duration));
-        }
-    }
+        if (_flyCoroutine != null) StopCoroutine(_flyCoroutine);
 
-    IEnumerator Fly(float flightHeight, float duration)
-    {
+        _groundY = transform.position.y;
         isFlying = true;
         rb.useGravity = false;
+        rb.linearVelocity = Vector3.zero;
 
-        float targetY = transform.position.y + flightHeight;
-        while (transform.position.y < targetY - 0.1f)
+        _flyCoroutine = StartCoroutine(AscendRoutine(_groundY + height));
+    }
+
+    public void StopFlying()
+    {
+        if (_flyCoroutine != null) StopCoroutine(_flyCoroutine);
+        _flyCoroutine = StartCoroutine(DescendRoutine(_groundY));
+    }
+
+    private IEnumerator AscendRoutine(float targetY)
+    {
+        while (Mathf.Abs(transform.position.y - targetY) > 0.05f)
         {
-            transform.position = Vector3.Lerp(transform.position, new Vector3(transform.position.x, targetY, transform.position.z), Time.deltaTime * 5f);
+            transform.position = Vector3.Lerp(
+                transform.position,
+                new Vector3(transform.position.x, targetY, transform.position.z),
+                Time.deltaTime * 5f
+            );
             yield return null;
         }
-        yield return new WaitForSeconds(duration);
 
+        transform.position = new Vector3(transform.position.x, targetY, transform.position.z);
+        _flyCoroutine = null;
+    }
+
+    private IEnumerator DescendRoutine(float targetY)
+    {
+        while (Mathf.Abs(transform.position.y - targetY) > 0.05f)
+        {
+            transform.position = Vector3.Lerp(
+                transform.position,
+                new Vector3(transform.position.x, targetY, transform.position.z),
+                Time.deltaTime * 3f
+            );
+            yield return null;
+        }
+
+        transform.position = new Vector3(transform.position.x, targetY, transform.position.z);
         rb.useGravity = true;
         isFlying = false;
+        _flyCoroutine = null;
     }
 
     // Resets the player's position and state (if needed)
