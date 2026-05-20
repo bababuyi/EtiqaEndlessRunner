@@ -22,7 +22,24 @@ public class TileManager : MonoBehaviour
     [SerializeField] private float buildingXOffset = 4.78f;
     [SerializeField] private float buildingYOffset = 4.06f;
 
+    [Header("Streetlights")]
+    [SerializeField] private GameObject[] streetlightPrefabs;
+    [SerializeField] private float streetlightSpacing = 30f;
+    [SerializeField] private float streetlightXOffset = 7.5f;
+    [SerializeField] private float streetlightYOffset = 0f;
+    [SerializeField] private Vector3 streetlightRotationLeft = new Vector3(0f, 90f, 0f);
+    [SerializeField] private Vector3 streetlightRotationRight = new Vector3(0f, -90f, 0f);
+
+    [Header("Sidewalk Props")]
+    [SerializeField] private GameObject[] sidewalkPropPrefabs;
+    [SerializeField] private float sidewalkPropSpacing = 15f;
+    [SerializeField] private float sidewalkPropXOffset = 6.5f;
+    [SerializeField] private float sidewalkPropYOffset = 0f;
+    [SerializeField] private float sidewalkPropSpawnChance = 0.6f;
+
     private float nextBuildingZ = 0f;
+    private float nextStreetlightZ = 0f;
+    private float nextSidewalkPropZ = 0f;
 
     [Header("Settings")]
     [SerializeField] private int tilesAhead = 6;
@@ -109,6 +126,8 @@ public class TileManager : MonoBehaviour
 
         GameObject firstTile = SpawnRoadTile(firstTilePrefab ?? roadTiles[0].prefab);
         SpawnSideBuildings();
+        SpawnStreetlights();
+        SpawnSidewalkProps();
 
         float measured = MeasureTileLength(firstTile);
         if (measured > 0.1f)
@@ -257,6 +276,8 @@ public class TileManager : MonoBehaviour
     {
         SpawnRoadTile(PickRandomTile());
         SpawnSideBuildings();
+        SpawnStreetlights();
+        SpawnSidewalkProps();
     }
 
     private GameObject SpawnRoadTile(GameObject prefab)
@@ -312,6 +333,54 @@ public class TileManager : MonoBehaviour
         }
     }
 
+    private void SpawnStreetlights()
+    {
+        if (streetlightPrefabs == null || streetlightPrefabs.Length == 0) return;
+
+        while (nextStreetlightZ < nextSpawnZ)
+        {
+            GameObject prefab = streetlightPrefabs[Random.Range(0, streetlightPrefabs.Length)];
+
+            // Right side
+            GameObject right = Instantiate(prefab, worldRoot);
+            right.transform.localPosition = new Vector3(streetlightXOffset, streetlightYOffset, nextStreetlightZ);
+            right.transform.localRotation = Quaternion.Euler(streetlightRotationRight);
+            activeSideTiles.Add(right);
+
+            // Left side
+            GameObject left = Instantiate(prefab, worldRoot);
+            left.transform.localPosition = new Vector3(-streetlightXOffset, streetlightYOffset, nextStreetlightZ);
+            left.transform.localRotation = Quaternion.Euler(streetlightRotationLeft);
+            activeSideTiles.Add(left);
+
+            nextStreetlightZ += streetlightSpacing;
+        }
+    }
+
+    private void SpawnSidewalkProps()
+    {
+        if (sidewalkPropPrefabs == null || sidewalkPropPrefabs.Length == 0) return;
+
+        while (nextSidewalkPropZ < nextSpawnZ)
+        {
+            if (Random.value <= sidewalkPropSpawnChance)
+            {
+                bool spawnRight = Random.value > 0.5f;
+
+                GameObject prefab = sidewalkPropPrefabs[Random.Range(0, sidewalkPropPrefabs.Length)];
+                float side = spawnRight ? sidewalkPropXOffset : -sidewalkPropXOffset;
+                float yRot = spawnRight ? Random.Range(-15f, 15f) : Random.Range(165f, 195f);
+
+                GameObject prop = Instantiate(prefab, worldRoot);
+                prop.transform.localPosition = new Vector3(side, sidewalkPropYOffset, nextSidewalkPropZ);
+                prop.transform.localRotation = Quaternion.Euler(0f, yRot, 0f);
+                activeSideTiles.Add(prop);
+            }
+
+            nextSidewalkPropZ += sidewalkPropSpacing;
+        }
+    }
+
     private void ClearAll()
     {
         foreach (var t in activeRoadTiles) if (t) Destroy(t);
@@ -320,7 +389,9 @@ public class TileManager : MonoBehaviour
         activeSideTiles.Clear();
 
         nextSpawnZ = 0f;
-        nextBuildingZ = 0f; // add this
+        nextBuildingZ = 0f;
+        nextStreetlightZ = 0f;
+        nextSidewalkPropZ = 0f;
         if (worldRoot) worldRoot.position = Vector3.zero;
     }
 

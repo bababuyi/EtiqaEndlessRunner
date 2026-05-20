@@ -143,7 +143,7 @@ public class Movement : MonoBehaviour
 
         isRolling = true;
 
-        playerCollider.height = originalColliderSize.y * 0.5f;
+        playerCollider.height = originalColliderSize.y * 0.25f;
         playerCollider.center = new Vector3(originalColliderCenter.x, 0.76f, originalColliderCenter.z);
 
         TileManager.Instance.WorldSpeed *= rollSpeedMultiplier;

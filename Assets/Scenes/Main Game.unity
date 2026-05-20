@@ -1262,6 +1262,7 @@ MonoBehaviour:
   settingsPanel: {fileID: 1070918979}
   soundToggle: {fileID: 929789456}
   volumeSlider: {fileID: 630660310}
+  mainMenuPanel: {fileID: 0}
 --- !u!4 &659000140
 Transform:
   m_ObjectHideFlags: 0
@@ -5384,10 +5385,27 @@ MonoBehaviour:
   - {fileID: 3470728474235468677, guid: 40d741e3f13120541a89a19d2724585c, type: 3}
   - {fileID: 4043278085868527713, guid: 12d99d864a78e994fbe25662da6b3ee4, type: 3}
   buildingSpacing: 8.26
-  buildingXOffset: 4.78
+  buildingXOffset: 8
   buildingYOffset: 4.06
-  tilesAhead: 6
-  tileLength: 28
+  streetlightPrefabs:
+  - {fileID: 5773675970288250723, guid: 6e2b0ab9eaac7934d8ee1182050d8acc, type: 3}
+  streetlightSpacing: 29
+  streetlightXOffset: 4.5
+  streetlightYOffset: 12.27
+  streetlightRotationLeft: {x: 0, y: 180, z: 0}
+  streetlightRotationRight: {x: 0, y: 0, z: 0}
+  sidewalkPropPrefabs:
+  - {fileID: 4057721920967068480, guid: 9667b5b13fe1a5e4ba9346199bed143d, type: 3}
+  - {fileID: 6321349150090309741, guid: c2658f3a49ece4c47ba192603c717599, type: 3}
+  - {fileID: 4591921911746888312, guid: 1c7c5660504a0ec4d961b99cfccaa9d2, type: 3}
+  - {fileID: 3187806245286486698, guid: b836aeef13897e546a147afcd8039881, type: 3}
+  - {fileID: 2172567123807068952, guid: 549ff0b7f02462f4d9fe616a797f24e7, type: 3}
+  sidewalkPropSpacing: 15
+  sidewalkPropXOffset: 5.7
+  sidewalkPropYOffset: 0
+  sidewalkPropSpawnChance: 0.8
+  tilesAhead: 2
+  tileLength: 29.423973
   startSpeed: 8
   maxSpeed: 22
   timeToMaxSpeed: 120
