@@ -58,6 +58,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         LoadCoins();
+        LoadHighScore();
         CachePlayer();
     }
 
@@ -131,7 +132,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void CommitFinalScore() => FinalScore = CurrentScore;
+    private void CommitFinalScore()
+    {
+        FinalScore = CurrentScore;
+        SaveHighScore();
+    }
 
     #endregion
 
@@ -177,6 +182,20 @@ public class GameManager : MonoBehaviour
 
     #endregion
 
+    public int HighScore { get; private set; }
+
+    private void LoadHighScore() =>
+        HighScore = PlayerPrefs.GetInt("HighScore", 0);
+
+    private void SaveHighScore()
+    {
+        if (FinalScore > HighScore)
+        {
+            HighScore = FinalScore;
+            PlayerPrefs.SetInt("HighScore", HighScore);
+            PlayerPrefs.Save();
+        }
+    }
     #region Game State
 
     public void TriggerGameOver()

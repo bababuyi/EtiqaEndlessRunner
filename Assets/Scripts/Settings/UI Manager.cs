@@ -32,6 +32,9 @@ public class UIManager : MonoBehaviour
 
     [Header("Main Menu")]
     [SerializeField] private GameObject mainMenuPanel;
+    [SerializeField] private TextMeshProUGUI highScoreText;
+    [SerializeField] private GameObject newBestLabel;
+
     #region Unity Lifecycle
 
     private void Awake()
@@ -47,6 +50,10 @@ public class UIManager : MonoBehaviour
 
         if (SceneManager.GetActiveScene().name == "Main Game")
             ResetHUD();
+
+        int best = PlayerPrefs.GetInt("HighScore", 0);
+        if (highScoreText != null)
+            highScoreText.text = "Best: " + best;
     }
 
     private void Update()
@@ -133,6 +140,9 @@ public class UIManager : MonoBehaviour
 
     private void HandleGameOver(int finalScore, int totalCoins)
     {
+        bool isNewBest = finalScore >= GameManager.Instance.HighScore;
+        if (newBestLabel != null) newBestLabel.SetActive(isNewBest);
+
         hudPanel?.SetActive(false);
         gameOverPanel?.SetActive(true);
 
@@ -144,6 +154,9 @@ public class UIManager : MonoBehaviour
 
         if (coinsCollectedText != null)
             coinsCollectedText.text = "Coins Collected: " + totalCoins;
+
+        if (highScoreText != null)
+            highScoreText.text = "Best: " + GameManager.Instance.HighScore;
     }
 
     public void OnRestartButton()
