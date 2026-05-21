@@ -34,7 +34,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject mainMenuPanel;
     [SerializeField] private TextMeshProUGUI highScoreText;
     [SerializeField] private GameObject newBestLabel;
-
+    [SerializeField] private GameObject shopPanel;
+    [SerializeField] private ShopUI shopUI;
     #region Unity Lifecycle
 
     private void Awake()
@@ -54,6 +55,9 @@ public class UIManager : MonoBehaviour
         int best = PlayerPrefs.GetInt("HighScore", 0);
         if (highScoreText != null)
             highScoreText.text = "Best: " + best;
+
+        if (SceneManager.GetActiveScene().name == "Main Menu")
+            mainMenuPanel?.SetActive(true);
     }
 
     private void Update()
@@ -214,9 +218,23 @@ public class UIManager : MonoBehaviour
     public void OnOpenSettingsButton()
     {
         AudioManager.Instance?.PlayButtonClick();
-        if (pauseMenuPanel != null) pauseMenuPanel.SetActive(false);
-        if (mainMenuPanel != null) mainMenuPanel.SetActive(false); // hide main menu
-        if (settingsPanel != null) settingsPanel.SetActive(true);
+        HideAllPanels();
+        settingsPanel?.SetActive(true);
+    }
+
+    public void OnShopButton()
+    {
+        AudioManager.Instance?.PlayButtonClick();
+        HideAllPanels();
+        shopPanel?.SetActive(true);
+        shopUI?.OnShopOpened();
+    }
+
+    public void OnCloseShopButton()
+    {
+        AudioManager.Instance?.PlayButtonClick();
+        HideAllPanels();
+        mainMenuPanel?.SetActive(true);
     }
 
     public void OnCloseSettingsButton()
@@ -300,9 +318,12 @@ public class UIManager : MonoBehaviour
 
     private void HideAllPanels()
     {
+        if (hudPanel != null) hudPanel.SetActive(false);
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
         if (pauseMenuPanel != null) pauseMenuPanel.SetActive(false);
         if (settingsPanel != null) settingsPanel.SetActive(false);
+        if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
+        if (shopPanel != null) shopPanel.SetActive(false);
     }
 
     #endregion
