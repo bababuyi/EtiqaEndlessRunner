@@ -134,9 +134,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1235914083250550444}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4065dd41d3375434abc12777d1291ba9, type: 3}
+  m_Script: {fileID: 11500000, guid: 0c70382f47fa8f24088765ca775437f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CoinCollect
+  rotationSpeed: 100
   coinValue: 1
 --- !u!4 &1904189088475212822 stripped
 Transform:

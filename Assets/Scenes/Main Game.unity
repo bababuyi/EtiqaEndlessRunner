@@ -703,7 +703,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 1dbcdd4464bdf4842a2df12b60a1236e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f797c53f07eb0bc43ae51ca995e5c6e8, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -3273,7 +3273,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 1dbcdd4464bdf4842a2df12b60a1236e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f797c53f07eb0bc43ae51ca995e5c6e8, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -4147,6 +4147,10 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 7197043140071279811, guid: 0ba6ac0a48205ef4a8a8a0c9b9fd9ad1, type: 3}
+      propertyPath: m_CollisionDetection
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7692195793689076126, guid: 0ba6ac0a48205ef4a8a8a0c9b9fd9ad1, type: 3}
       propertyPath: m_Enabled
       value: 1
@@ -4276,7 +4280,6 @@ MonoBehaviour:
   hardTilesBeforeBreather: 5
   breatherLength: 3
   worldRoot: {fileID: 189575406}
-  sideXOffset: 15
 --- !u!224 &1503720603931993651
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5397,7 +5400,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 1dbcdd4464bdf4842a2df12b60a1236e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f797c53f07eb0bc43ae51ca995e5c6e8, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

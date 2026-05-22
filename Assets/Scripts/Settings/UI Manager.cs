@@ -133,7 +133,11 @@ public class UIManager : MonoBehaviour
         if (hudPanel != null) hudPanel.SetActive(true);
 
         if (scoreText != null) scoreText.text = "Score: 0";
-        if (coinText != null) coinText.text = "Coins: 0";
+        if (coinText != null)
+        {
+            int coins = GameManager.Instance != null ? GameManager.Instance.TotalCoins : 0;
+            coinText.text = "Coins: " + coins;
+        }
         if (distanceText != null) distanceText.text = "0m";
         if (hpText != null) hpText.text = "HP: --";
     }

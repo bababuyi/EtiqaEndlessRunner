@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Movement : MonoBehaviour
@@ -31,7 +30,6 @@ public class Movement : MonoBehaviour
     private CapsuleCollider playerCollider;
     private Vector3 originalColliderSize;
     private Vector3 originalColliderCenter;
-    private float defaultGravity;
     private Coroutine _flyCoroutine;
     private float _groundY;
 
@@ -42,23 +40,15 @@ public class Movement : MonoBehaviour
 
         originalColliderSize = playerCollider.height * Vector3.up;
         originalColliderCenter = playerCollider.center;
-        defaultGravity = rb.useGravity ? 1f : 0f;
 
         rb.isKinematic = false;
     }
 
     void Update()
     {
-        if (rb.isKinematic)
-        {
-            rb.isKinematic = false;
-        }
-
         HandleInput();
         MoveToTargetLane();
-    }
-
-    
+    }    
 
     // Handles input
     void HandleInput()
@@ -143,8 +133,12 @@ public class Movement : MonoBehaviour
 
         isRolling = true;
 
-        playerCollider.height = originalColliderSize.y * 0.25f;
-        playerCollider.center = new Vector3(originalColliderCenter.x, 0.76f, originalColliderCenter.z);
+        float originalBottom = originalColliderCenter.y - originalColliderSize.y * 0.5f;
+        float rollHeight = originalColliderSize.y * 0.25f;
+        float rollCenterY = originalBottom + rollHeight * 0.5f;
+
+        playerCollider.height = rollHeight;
+        playerCollider.center = new Vector3(originalColliderCenter.x, rollCenterY, originalColliderCenter.z);
 
         TileManager.Instance.WorldSpeed *= rollSpeedMultiplier;
 

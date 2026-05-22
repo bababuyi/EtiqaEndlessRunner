@@ -78,10 +78,6 @@ public class TileManager : MonoBehaviour
     private readonly List<GameObject> activeRoadTiles = new();
     private readonly List<GameObject> activeSideTiles = new();
 
-    private const float LEFT_LANE = -3f;
-    private const float MIDDLE_LANE = 0f;
-    private const float RIGHT_LANE = 3f;
-
     private void Awake()
     {
         if (Instance == null)
@@ -107,7 +103,6 @@ public class TileManager : MonoBehaviour
         TrySpawn();
         TryRecycle();
         UpdateSpeed();
-        Debug.Log($"Tiles: {activeRoadTiles.Count}, nextSpawnZ: {nextSpawnZ}, worldZ: {worldRoot.position.z}");
     }
 
     private void OnDestroy()
@@ -308,8 +303,6 @@ public class TileManager : MonoBehaviour
         Debug.Log($"TileManager: Auto-measured tile length = {measured:F2}");
         return measured;
     }
-
-    [SerializeField] private float sideXOffset = 15f;
 
     private void SpawnSideBuildings()
     {

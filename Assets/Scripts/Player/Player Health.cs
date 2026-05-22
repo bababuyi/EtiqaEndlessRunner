@@ -24,27 +24,11 @@ public class PlayerHealth : MonoBehaviour
             Debug.LogError("Movement script not found on player!");
     }
 
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.H))
-        {
-            StartCoroutine(TakeDamage());
-        }
-    }
-
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Obstacle"))
+        if (other.CompareTag("Obstacle") && !isInvincible)
         {
-            Debug.Log("Obstacle hit!");
-            if (!isInvincible)
-            {
-                StartCoroutine(TakeDamage());
-            }
-            else
-            {
-                Debug.Log("Player is invincible! No damage taken.");
-            }
+            StartCoroutine(TakeDamage());
         }
     }
 
@@ -53,8 +37,7 @@ public class PlayerHealth : MonoBehaviour
         if (isHurt)
         {
             CurrentHP = 0;
-            OnHealthChanged?.Invoke(CurrentHP, MaxHP);
-            Debug.Log("Player hit again within hit window! GAME OVER.");
+            OnHealthChanged?.Invoke(CurrentHP, MaxHP);;
  
             AudioManager.Instance?.PlayHit();
             AudioManager.Instance?.PlayLose();
@@ -67,9 +50,6 @@ public class PlayerHealth : MonoBehaviour
         CurrentHP = 1;
         OnHealthChanged?.Invoke(CurrentHP, MaxHP);
 
-        Debug.Log("Player stumbled! Speed reduced.");
-        isHurt = true;
-
         TileManager.Instance.WorldSpeed = Mathf.Max(5f,TileManager.Instance.WorldSpeed - speedReduction);
 
         if (AudioManager.Instance != null)
@@ -77,23 +57,16 @@ public class PlayerHealth : MonoBehaviour
             AudioManager.Instance?.PlayHit();
         }
 
-        bool moved = TryMoveToFreeLane();
-
-        if (!moved)
-        {
-            Debug.Log("No free lane found. Player stumbles instead.");
-        }
+        TryMoveToFreeLane();
 
         yield return new WaitForSeconds(hitWindow);
 
         if (isHurt)
         {
-            Debug.Log("Player recovered!");
             isHurt = false;
         }
 
         yield return new WaitForSeconds(recoveryTime - hitWindow);
-        Debug.Log("Player is now vulnerable again.");
     }
 
     public void SetInvincible(bool active)
@@ -103,8 +76,6 @@ public class PlayerHealth : MonoBehaviour
 
     bool TryMoveToFreeLane()
     {
-        Debug.Log("Checking for a free lane...");
-
         bool canMoveLeft = movementScript.targetLane > 0;
         bool canMoveRight = movementScript.targetLane < 2;
 
@@ -113,19 +84,15 @@ public class PlayerHealth : MonoBehaviour
 
         if (canMoveRight && !rightBlocked)
         {
-            Debug.Log("➡ Right lane is free! Moving right.");
             movementScript.ChangeLane(1);
             return true;
         }
 
         if (canMoveLeft && !leftBlocked)
         {
-            Debug.Log("⬅ Left lane is free! Moving left.");
             movementScript.ChangeLane(-1);
             return true;
         }
-
-        Debug.Log("🚧 No free lane found. Player will stumble in place.");
         return false;
     }
 
@@ -133,28 +100,21 @@ public class PlayerHealth : MonoBehaviour
     {
         Vector3 lanePosition = new Vector3((laneIndex - 1) * movementScript.laneDistance, transform.position.y, transform.position.z);
 
-        Debug.Log("Checking obstacles in lane " + laneIndex + " at position: " + lanePosition);
-
         Collider[] hitColliders = Physics.OverlapSphere(lanePosition, 1f);
 
         foreach (Collider hit in hitColliders)
         {
-            Debug.Log("Object found: " + hit.gameObject.name + " in lane " + laneIndex);
-
             if (hit.CompareTag("Obstacle"))
             {
-                Debug.Log("🚧 OBSTACLE DETECTED in lane " + laneIndex + " - " + hit.gameObject.name);
                 return true;
             }
         }
 
-        Debug.Log("✅ Lane " + laneIndex + " is CLEAR!");
         return false;
     }
 
     void GameOver()
     {
-        Debug.Log("GAME OVER! Player lost the run.");
         GameManager.Instance?.TriggerGameOver();
     }
 }

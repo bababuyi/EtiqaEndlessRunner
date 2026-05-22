@@ -117,17 +117,13 @@ public class GameManager : MonoBehaviour
     {
         if (TileManager.Instance == null) return;
 
-        float speed = TileManager.Instance.WorldSpeed;
-
-        DistanceMetres += speed * Time.deltaTime;
+        DistanceMetres += TileManager.Instance.WorldSpeed * Time.deltaTime;
         OnDistanceUpdated?.Invoke(DistanceMetres);
 
-        float scoreGain = speed * scoreMultiplier * Time.deltaTime;
-        int updated = CurrentScore + Mathf.RoundToInt(scoreGain);
-
-        if (updated != CurrentScore)
+        int newScore = Mathf.FloorToInt(DistanceMetres * scoreMultiplier);
+        if (newScore != CurrentScore)
         {
-            CurrentScore = updated;
+            CurrentScore = newScore;
             OnScoreUpdated?.Invoke(CurrentScore);
         }
     }
