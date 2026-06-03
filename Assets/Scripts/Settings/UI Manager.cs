@@ -58,6 +58,8 @@ public class UIManager : MonoBehaviour
 
         if (SceneManager.GetActiveScene().name == "Main Menu")
             mainMenuPanel?.SetActive(true);
+        if (SceneManager.GetActiveScene().name == "Main Game")
+            HideCursor();
     }
 
     private void Update()
@@ -165,6 +167,7 @@ public class UIManager : MonoBehaviour
 
         if (highScoreText != null)
             highScoreText.text = "Best: " + GameManager.Instance.HighScore;
+        ShowCursor();
     }
 
     public void OnRestartButton()
@@ -205,12 +208,14 @@ public class UIManager : MonoBehaviour
     {
         pauseMenuPanel?.SetActive(true);
         settingsPanel?.SetActive(false);
+        ShowCursor();
     }
 
     private void HandleGameResumed()
     {
-        if (pauseMenuPanel != null) pauseMenuPanel.SetActive(false);
+        pauseMenuPanel?.SetActive(false);
         settingsPanel?.SetActive(false);
+        HideCursor();
     }
 
     public void OnResumeButton()
@@ -239,6 +244,18 @@ public class UIManager : MonoBehaviour
         AudioManager.Instance?.PlayButtonClick();
         HideAllPanels();
         mainMenuPanel?.SetActive(true);
+    }
+
+    private void HideCursor()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
+    private void ShowCursor()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     public void OnCloseSettingsButton()
